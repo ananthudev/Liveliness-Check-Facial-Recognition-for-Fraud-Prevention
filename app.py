@@ -24,15 +24,17 @@ def login():
         userDetails = request.form
         username = userDetails['username']
         password = userDetails['password']
+        email = userDetails['email'] 
+        dob = userDetails['dob']  
         
         cur = mysql.connection.cursor()
 
         # Sql query
 
-        cur.execute("INSERT INTO liveness (username, password, email, dob) VALUES(%s, %s)", (username, password, email, dob))
+        cur.execute("INSERT INTO liveness (username, password , email, dob) VALUES(%s, %s, %s , %s)", (username, password, email, dob))
         mysql.connection.commit()
         cur.close()
-        return 'success'
+        # return 'success'
     return render_template('login.html')
 
 if __name__ == '__main__':
