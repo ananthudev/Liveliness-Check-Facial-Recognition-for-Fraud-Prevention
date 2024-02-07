@@ -22,16 +22,21 @@ def login():
     if request.method == 'POST':
         # Fetch form data
         userDetails = request.form
+        name = userDetails['name']
+        age = userDetails['age']
+        phno = userDetails['phno']
+        dob = userDetails['dob']
+        email = userDetails['email']
         username = userDetails['username']
         password = userDetails['password']
-        email = userDetails['email'] 
-        dob = userDetails['dob']  
+         
+          
         
         cur = mysql.connection.cursor()
 
         # Sql query
 
-        cur.execute("INSERT INTO liveness (username, password , email, dob) VALUES(%s, %s, %s , %s)", (username, password, email, dob))
+        cur.execute("INSERT INTO liveness (name, age,  phno, dob, email, username, password) VALUES(%s, %s, %s , %s, %s, %s , %s)", (name, age, phno, dob, email, username, password))
         mysql.connection.commit()
         cur.close()
         # return 'success'
