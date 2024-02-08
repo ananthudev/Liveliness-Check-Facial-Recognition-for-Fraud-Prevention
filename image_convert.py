@@ -12,10 +12,9 @@ def convert_image_to_base64(image):
     return base64.b64encode(buffered.getvalue()).decode()
 
 def save_base64_to_image(base64_str, username, image_type):
-    """
-    Saves a Base64 string as an image file and returns the file path.
-    Assumes `image_type` is either 'front' or 'back'.
-    """
+  
+    # Saves a Base64 string as an image file and returns the file path.
+   
     img_data = base64.b64decode(base64_str)
     img = Image.open(io.BytesIO(img_data))
   

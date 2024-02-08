@@ -9,6 +9,9 @@ import base64 # module for converting raw image into base64 string
 from image_convert import convert_image_to_base64, save_base64_to_image
 #imported image_converted module 
 
+# Import the face extraction function
+from face_extractor import extract_face_and_save
+
 app = Flask(__name__)
 
 
@@ -88,13 +91,22 @@ def upload_id():
             image_type = 'front' if index == 0 else 'back'
             file_path = save_base64_to_image(base64_str, username, image_type)
             file_paths.append(file_path)
+
+            # For face extraction, 
+            if index == 0:
+                # Extract the face and save its path
+                profile_image_path = extract_face_and_save(file_path, username)
+                # If a face was successfully extracted and saved
+                if profile_image_path:
+                    # Update the idcards table with the path to the profile image
+                    cur.execute("UPDATE idcards SET userprofileimage = %s WHERE username = %s", (profile_image_path, username))
         
-        # Insert the file paths into the database
+        # Insert or update the file paths of the front and back images into the database
         cur.execute("""INSERT INTO idcards (username, front, back) VALUES (%s, %s, %s)
                        ON DUPLICATE KEY UPDATE front=VALUES(front), back=VALUES(back)""", 
                     (username, file_paths[0], file_paths[1]))
         
-        # Update the step in the liveness table for the username
+        # Update the step in the liveness table for the username to 2 after successful ID card upload
         cur.execute("UPDATE liveness SET step = 2 WHERE username = %s", [username])
         mysql.connection.commit()
     except Exception as e:
@@ -103,7 +115,7 @@ def upload_id():
     finally:
         cur.close()
 
-    return "Images uploaded successfully."
+    return "ID card and profile image uploaded successfully."
 
 
 
