@@ -67,7 +67,7 @@ def id_form():
     return render_template('id.html')
 
 
-# Image Upload roue
+# Image Upload route
 @app.route('/id', methods=['POST'])
 def upload_id():
     if 'username' not in session:
@@ -89,16 +89,18 @@ def upload_id():
             file_path = save_base64_to_image(base64_str, username, image_type)
             file_paths.append(file_path)
 
-        # Extract, convert and save the face image from the front ID image
+       #Insert into idcards table front, back and username
+        cur.execute("""INSERT INTO idcards (username, front, back) VALUES (%s, %s, %s)
+                       ON DUPLICATE KEY UPDATE front = VALUES(front), back = VALUES(back)""", 
+                    (username, file_paths[0], file_paths[1]))
+        
+         # Extract, convert and save the face image from the front ID image
         profile_image_base64 = extract_face_and_return_base64(file_paths[0])
         if profile_image_base64:
             profile_image_path = save_base64_to_image(profile_image_base64, username, "profile")
             # Update database with the profile image path
             cur.execute("""UPDATE idcards SET userprofileimage = %s WHERE username = %s""", (profile_image_path, username))
 
-        cur.execute("""INSERT INTO idcards (username, front, back) VALUES (%s, %s, %s)
-                       ON DUPLICATE KEY UPDATE front = VALUES(front), back = VALUES(back)""", 
-                    (username, file_paths[0], file_paths[1]))
         
         # Update the step in the liveness table for the username
         cur.execute("UPDATE liveness SET step = 2 WHERE username = %s", [username])
