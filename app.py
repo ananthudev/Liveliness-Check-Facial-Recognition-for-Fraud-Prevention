@@ -10,7 +10,7 @@ from image_convert import convert_image_to_base64, save_base64_to_image
 #imported image_converted module 
 
 # Import the face extraction function
-from face_extractor import extract_face_and_save
+from face_extractor import extract_face_and_return_base64
 
 app = Flask(__name__)
 
@@ -68,7 +68,6 @@ def id_form():
 
 
 # Image Upload roue
-@app.route('/id', methods=['POST'])
 def upload_id():
     if 'username' not in session:
         return "User not logged in", 403
@@ -83,31 +82,23 @@ def upload_id():
     try:
         file_paths = []
         for index, file in enumerate(files):
-            # Convert the image to a PIL Image
             image = Image.open(file.stream)
-            # Convert the image to Base64
             base64_str = convert_image_to_base64(image)
-            # Save the Base64 string as an image and get the file path
             image_type = 'front' if index == 0 else 'back'
             file_path = save_base64_to_image(base64_str, username, image_type)
             file_paths.append(file_path)
 
-            # For face extraction, 
-            if index == 0:
-                # Extract the face and save its path
-                profile_image_path = extract_face_and_save(file_path, username)
-                # If a face was successfully extracted and saved
-                if profile_image_path:
-                    # Update the idcards table with the path to the profile image
-                    cur.execute("UPDATE idcards SET userprofileimage = %s WHERE username = %s", (profile_image_path, username))
-        
-        # Insert or update the file paths of the front and back images into the database
+        # Extract, convert and save the face image from the front ID image
+        profile_image_base64 = extract_face_and_return_base64(file_paths[0])
+        if profile_image_base64:
+            profile_image_path = save_base64_to_image(profile_image_base64, username, "profile")
+            # Update database with the profile image path
+            cur.execute("""UPDATE idcards SET userprofileimage = %s WHERE username = %s""", (profile_image_path, username))
+
         cur.execute("""INSERT INTO idcards (username, front, back) VALUES (%s, %s, %s)
-                       ON DUPLICATE KEY UPDATE front=VALUES(front), back=VALUES(back)""", 
+                       ON DUPLICATE KEY UPDATE front = VALUES(front), back = VALUES(back)""", 
                     (username, file_paths[0], file_paths[1]))
-        
-        # Update the step in the liveness table for the username to 2 after successful ID card upload
-        cur.execute("UPDATE liveness SET step = 2 WHERE username = %s", [username])
+
         mysql.connection.commit()
     except Exception as e:
         mysql.connection.rollback()
@@ -115,9 +106,7 @@ def upload_id():
     finally:
         cur.close()
 
-    return "ID card and profile image uploaded successfully."
-
-
+    return "ID card and profile image uploaded successfully."
 
 if __name__ == '__main__':
     app.run(debug=True)
