@@ -2,7 +2,7 @@ import cv2
 from PIL import Image
 import os
 
-def extract_face_and_save(image_path, username, expand_margin=0.7):
+def extract_face_and_save(image_path, username, expand_margin=0.):
     # Load the pre-trained model (haarcascade_frontalface_default.xml)
     face_cascade = cv2.CascadeClassifier(cv2.data.haarcascades + 'haarcascade_frontalface_default.xml')
     
