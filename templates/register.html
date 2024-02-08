@@ -1,83 +1,10 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Registration Form</title>
-    <style>
-        html, body {
-            height: 100%;
-            margin: 0;
-            padding: 0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            background-color: #f0f0f0;
-            font-family: Arial, sans-serif;
-        }
-        form {
-            background-color: #ffffff;
-            padding: 20px;
-            border-radius: 18px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-            transition: transform 0.3s ease-in-out;
-            max-width: 400px; 
-            width: 100%; 
-            box-sizing: border-box; 
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 10px;
-            align-items: center;
-        }
-        form:hover {
-            transform: scale(1.02);
-        }
-        h2 {
-            text-align: center;
-            grid-column: 1 / -1; /
-        }
-        div.form-item {
-            display: contents; 
-        }
-        label {
-            text-align: left;
-            padding-left: 10px; 
-        }
-        input[type="text"],
-        input[type="password"],
-        input[type="email"],
-        input[type="date"],
-        input[type="number"],
-        input[type="tel"] {
-            width: 100%;
-            padding: 8px;
-            margin: 0;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-            transition: border-color 0.2s ease-in-out;
-        }
-        input[type="submit"], input[type="reset"] {
-            width: calc(50% - 5px); /* Adjust width for spacing */
-            padding: 10px;
-            border: none;
-            border-radius: 4px;
-            color: white;
-            cursor: pointer;
-            transition: background-color 0.2s ease-in-out;
-        }
-        input[type="submit"] {
-            background-color: #007bff;
-            grid-column: 2;
-        }
-        input[type="submit"]:hover {
-            background-color: #0056b3;
-        }
-        input[type="reset"] {
-            background-color: #6c757d;
-            grid-column: 1;
-        }
-        input[type="reset"]:hover {
-            background-color: #5a6268;
-        }
-    </style>
+<title>Registration Form</title>
+<link rel="stylesheet" href="/static/css/style.css">
+<script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
 </head>
 <body>
     <form action="/register/" method="post">
@@ -114,5 +41,53 @@
         <input type="submit" value="Next">
         
     </form>
+
+    <script>
+        document.querySelector('form').addEventListener('submit', function(e) {
+            e.preventDefault(); // Prevent the default form submission
+        
+            const formData = new FormData(this);
+            fetch('/register/', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if(data.error) {
+                    // User exists, show SweetAlert2 popup
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Oops...',
+                        text: data.error
+                    });
+                } else {
+                    // User registered, redirect or show success message
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Registered!',
+                        text: 'You have been registered successfully.'
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            window.location.href = '/id'; // Redirect to ID form or any other page
+                        }
+                    });
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                // Show error alert
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Oops...',
+                    text: 'Something went wrong!'
+                });
+            });
+        });
+        </script>
+        
+
+
+
+
 </body>
 </html>

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Registration Successful...!</title>
+    <title>Upload ID Card</title>
     <style>
         body {
             display: flex;
@@ -15,59 +15,54 @@
             color: #ffffff; /* White text color */
             margin: 0;
         }
-        .message {
-            text-align: center;
-            animation: fadeIn 2s ease-in-out;
-        }
-        h2 {
-            font-size: 2em;
-            background-color: #32cd32; /* Green background */
+        .upload-form {
+            background-color: #ffffff;
             padding: 20px;
             border-radius: 10px;
             box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
-            animation: popIn 1s ease-out forwards, colorChange 5s infinite alternate;
+            color: #000; /* Text color for the form */
+        }
+        h2 {
+            color: #000; /* Ensuring text color is visible on light background */
+        }
+        label {
+            display: block;
+            margin-bottom: 10px;
+        }
+        input[type="file"] {
+            margin-bottom: 20px;
+        }
+        button {
+            display: inline-block;
+            padding: 10px 20px;
+            background-color: #32cd32; /* Green background */
+            color: #ffffff; /* White text color */
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        button:hover {
+            background-color: #28a745; /* Darker green */
         }
 
-        /* Fade-in animation */
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-            }
-            to {
-                opacity: 1;
-            }
-        }
-
-        /* Pop-in animation */
-        @keyframes popIn {
-            0% {
-                transform: scale(0);
-            }
-            80% {
-                transform: scale(1.1);
-            }
-            100% {
-                transform: scale(1);
-            }
-        }
-
-        /* Color change animation */
-        @keyframes colorChange {
-            0% {
-                background-color: #32cd32; /* Green */
-            }
-            50% {
-                background-color: #ff8c00; /* Dark orange */
-            }
-            100% {
-                background-color: #1e90ff; /* Dodger blue */
-            }
-        }
+        /* Existing animations */
+        @keyframes fadeIn { /* Same as before */ }
+        @keyframes popIn { /* Same as before */ }
+        @keyframes colorChange { /* Same as before */ }
     </style>
 </head>
 <body>
-    <div class="message">
-        <h2>Registration Successful</h2>
+    <div class="upload-form">
+        <h2>Upload ID Card</h2>
+        <form action="/id" method="post" enctype="multipart/form-data">
+            <div>
+                <label for="id_images">Select ID Card Images:</label>
+                <input type="file" id="id_images" name="id_images" accept="image/png, image/jpeg" multiple required>
+                <small>Please select both the front and back images of your ID card.</small>
+            </div>
+            <button type="submit">Upload</button>
+        </form>
     </div>
 </body>
 </html>
