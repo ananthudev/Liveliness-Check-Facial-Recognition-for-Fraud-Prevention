@@ -1,6 +1,13 @@
 from flask import Flask, render_template, request, redirect, url_for, session, jsonify
 from flask_mysqldb import MySQL
+from PIL import Image # pillow for image manipulatipon, converting to image to base 64 and vice versa
+import io
 import os
+import base64 # module for converting raw image into base64 string
+
+
+from image_convert import convert_image_to_base64, save_base64_to_image
+#imported image_converted module 
 
 app = Flask(__name__)
 
@@ -22,9 +29,7 @@ def home():
     return render_template('register.html', step=0)
 
 
-#App route for registration
-
-
+#App route for registration and save into database liveness and javascript for phone number exists
 @app.route('/register/', methods=['POST'])
 def register():
     userDetails = request.form
@@ -55,33 +60,42 @@ def register():
 
 @app.route('/id')
 def id_form():
-    #  image upload
+   
     return render_template('id.html')
 
+
+# Image Upload roue
 @app.route('/id', methods=['POST'])
 def upload_id():
     if 'username' not in session:
         return "User not logged in", 403
-
+    
     username = session['username']
     files = request.files.getlist("id_images")
 
     if len(files) != 2:
         return "Please upload exactly two images.", 400
-
-    front_image = files[0].read()
-    back_image = files[1].read()
-
+    
     cur = mysql.connection.cursor()
     try:
-        cur.execute("""INSERT INTO idcards (front, back, username) 
-                       VALUES (%s, %s, %s)
-                       ON DUPLICATE KEY UPDATE front = VALUES(front), back = VALUES(back)""", 
-                    (front_image, back_image, username))
+        file_paths = []
+        for index, file in enumerate(files):
+            # Convert the image to a PIL Image
+            image = Image.open(file.stream)
+            # Convert the image to Base64
+            base64_str = convert_image_to_base64(image)
+            # Save the Base64 string as an image and get the file path
+            image_type = 'front' if index == 0 else 'back'
+            file_path = save_base64_to_image(base64_str, username, image_type)
+            file_paths.append(file_path)
         
-         # Update the step in the liveness table for the username
-        cur.execute("""UPDATE liveness SET step = 2 
-                       WHERE username = %s""", [username])
+        # Insert the file paths into the database
+        cur.execute("""INSERT INTO idcards (username, front, back) VALUES (%s, %s, %s)
+                       ON DUPLICATE KEY UPDATE front=VALUES(front), back=VALUES(back)""", 
+                    (username, file_paths[0], file_paths[1]))
+        
+        # Update the step in the liveness table for the username
+        cur.execute("UPDATE liveness SET step = 2 WHERE username = %s", [username])
         mysql.connection.commit()
     except Exception as e:
         mysql.connection.rollback()
@@ -90,6 +104,7 @@ def upload_id():
         cur.close()
 
     return "Images uploaded successfully."
+
 
 
 if __name__ == '__main__':
