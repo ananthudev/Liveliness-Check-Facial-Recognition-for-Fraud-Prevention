@@ -99,6 +99,9 @@ def upload_id():
         cur.execute("""INSERT INTO idcards (username, front, back) VALUES (%s, %s, %s)
                        ON DUPLICATE KEY UPDATE front = VALUES(front), back = VALUES(back)""", 
                     (username, file_paths[0], file_paths[1]))
+        
+        # Update the step in the liveness table for the username
+        cur.execute("UPDATE liveness SET step = 2 WHERE username = %s", [username])
 
         mysql.connection.commit()
     except Exception as e:
