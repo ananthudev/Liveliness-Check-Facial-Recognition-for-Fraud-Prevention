@@ -13,9 +13,9 @@ def extract_face_and_return_filepath(image_path, expand_margin=0.7):
     
     # Convert to grayscale for the face detection
     gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-    
-    # Detect faces in the image
-    faces = face_cascade.detectMultiScale(gray, 1.1, 4)
+
+    # Detect faces in the image with adjusted parameters to reduce false positives
+    faces = face_cascade.detectMultiScale(gray, scaleFactor=1.1, minNeighbors=5, minSize=(30, 30))
     
     if len(faces) == 0:
         return None  # Return None if no faces are detected
@@ -43,9 +43,9 @@ def extract_face_and_return_filepath(image_path, expand_margin=0.7):
     face_image.save(buffered, format="PNG")
     base64_face = base64.b64encode(buffered.getvalue()).decode()
 
-    return base64_face
+    # Save the face image and return the file path instead of base64 string
+    return save_base64_to_image(base64_face, 'user', 'face')
 
-# Optionally, you can keep the function to save a base64 string as an image file
 def save_base64_to_image(base64_str, username, image_type='profile'):
     img_data = base64.b64decode(base64_str)
     img = Image.open(io.BytesIO(img_data))

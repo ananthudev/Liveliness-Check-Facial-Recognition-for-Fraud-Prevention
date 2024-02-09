@@ -89,30 +89,43 @@ def upload_id():
             file_path = save_base64_to_image(base64_str, username, image_type)
             file_paths.append(file_path)
 
-       #Insert into idcards table front, back and username
-        cur.execute("""INSERT INTO idcards (username, front, back) VALUES (%s, %s, %s)
-                       ON DUPLICATE KEY UPDATE front = VALUES(front), back = VALUES(back)""", 
-                    (username, file_paths[0], file_paths[1]))
-        
-         # Extract, convert and save the face image from the front ID image
+
+
+        # Attempt to extract the face, and if successful, proceed with database operations
         profile_image_base64 = extract_face_and_return_filepath(file_paths[0])
         if profile_image_base64:
+            # Since a face was detected, insert the images into the database
+            cur.execute("""INSERT INTO idcards (username, front, back) VALUES (%s, %s, %s)
+                           ON DUPLICATE KEY UPDATE front = VALUES(front), back = VALUES(back)""", 
+                        (username, file_paths[0], file_paths[1]))
+
+
+            # Save the profile image
             profile_image_path = save_base64_to_image(profile_image_base64, username, "profile")
             # Update database with the profile image path
             cur.execute("""UPDATE idcards SET userprofileimage = %s WHERE username = %s""", (profile_image_path, username))
+            
 
-        
-        # Update the step in the liveness table for the username
-        cur.execute("UPDATE liveness SET step = 2 WHERE username = %s", [username])
 
-        mysql.connection.commit()
+            # Update the step in the liveness table for the username
+            cur.execute("UPDATE liveness SET step = 2 WHERE username = %s", [username])
+
+
+
+            mysql.connection.commit()
+            return "ID card and profile image uploaded successfully."
+        else:
+            # If no face is detected, roll back any file saves and return an error message
+            for path in file_paths:
+                os.remove(path)  # Remove the saved images as they are not needed
+            mysql.connection.rollback()
+            return jsonify({'error': 'No face detected in the uploaded ID card. Please upload a clear ID card image with a visible face.'}), 400
     except Exception as e:
         mysql.connection.rollback()
         return f"Error: {e}"
     finally:
         cur.close()
 
-    return "ID card and profile image uploaded successfully."
 
 if __name__ == '__main__':
     app.run(debug=True)
