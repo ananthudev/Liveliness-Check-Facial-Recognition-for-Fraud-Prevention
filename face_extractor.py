@@ -4,7 +4,7 @@ import os
 import io
 import base64
 
-def extract_face_and_return_filepath(image_path, expand_margin=0.7):
+def extract_face_and_return_filepath(image_path, username, expand_margin=0.7):
     # Load the pre-trained model
     face_cascade = cv2.CascadeClassifier(cv2.data.haarcascades + 'haarcascade_frontalface_default.xml')
     
@@ -43,8 +43,12 @@ def extract_face_and_return_filepath(image_path, expand_margin=0.7):
     face_image.save(buffered, format="PNG")
     base64_face = base64.b64encode(buffered.getvalue()).decode()
 
+    return base64_face
+
     # Save the face image and return the file path instead of base64 string
-    return save_base64_to_image(base64_face, 'user', 'face')
+    # return save_base64_to_image(base64_face, username, 'face')
+
+  
 
 def save_base64_to_image(base64_str, username, image_type='profile'):
     img_data = base64.b64decode(base64_str)
