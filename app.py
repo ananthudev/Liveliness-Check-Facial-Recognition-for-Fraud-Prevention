@@ -10,7 +10,7 @@ from image_convert import convert_image_to_base64, save_base64_to_image
 #imported image_converted module 
 
 # Import the face extraction function
-from face_extractor import extract_face_and_return_base64
+from face_extractor import extract_face_and_return_filepath
 
 app = Flask(__name__)
 
@@ -95,7 +95,7 @@ def upload_id():
                     (username, file_paths[0], file_paths[1]))
         
          # Extract, convert and save the face image from the front ID image
-        profile_image_base64 = extract_face_and_return_base64(file_paths[0])
+        profile_image_base64 = extract_face_and_return_filepath(file_paths[0])
         if profile_image_base64:
             profile_image_path = save_base64_to_image(profile_image_base64, username, "profile")
             # Update database with the profile image path

@@ -4,7 +4,7 @@ import os
 import io
 import base64
 
-def extract_face_and_return_base64(image_path, expand_margin=0.7):
+def extract_face_and_return_filepath(image_path, expand_margin=0.7):
     # Load the pre-trained model
     face_cascade = cv2.CascadeClassifier(cv2.data.haarcascades + 'haarcascade_frontalface_default.xml')
     
