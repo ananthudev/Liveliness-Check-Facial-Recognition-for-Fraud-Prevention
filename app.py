@@ -101,9 +101,9 @@ def upload_id():
 
 
             # Save the profile image
-            profile_image_path = save_base64_to_image(profile_image_base64, username, "profile")
+            profile_image_path = save_base64_to_image(file_path, username, "profile")
             # Update database with the profile image path
-            cur.execute("""UPDATE idcards SET userprofileimage = %s WHERE username = %s""", (profile_image_path, username))
+            cur.execute("""UPDATE idcards SET userprofileimage = %s WHERE username = %s""", (file_path, username))
             
 
 
