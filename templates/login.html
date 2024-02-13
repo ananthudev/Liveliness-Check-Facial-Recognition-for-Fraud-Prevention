@@ -21,5 +21,35 @@
         <input type="reset" value="Reset">
         <input type="submit" value="Login">
     </form>
+
+
+
+
+
+     {# SweetAlert2 pop up to for login#} 
+    {# SweetAlert2 pop up to for login#} 
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            {% if session.pop('login_success', None) %}
+            Swal.fire({
+                title: 'Success!',
+                text: 'You have successfully logged in.',
+                icon: 'success',
+                confirmButtonText: 'OK'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    // Optional: Perform any action after closing the alert
+                }
+            });
+            {% endif %}
+        });
+    </script>
+
+ 
+
+
+
+
+
 </body>
 </html>

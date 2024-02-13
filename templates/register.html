@@ -1,56 +1,114 @@
 <!DOCTYPE html>
-<html>
-<head>
-<title>Registration Form</title>
-<link rel="stylesheet" href="/static/css/style.css">
-<script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<!-- Created by CodingLab |www.youtube.com/c/CodingLabYT-->
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="UTF-8">
+    <!--<title> Login and Registration Form in HTML & CSS | CodingLab </title>-->
+    <link rel="stylesheet" href="/static/css/style.css">
+    <!-- Fontawesome CDN Link -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+    <script src="https://kit.fontawesome.com/your_kit_code.js" crossorigin="anonymous"></script>
+    <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
-</head>
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+   </head>
 <body>
-    <form action="/register/" method="post">
-        <h2>Registration Form</h2>
-        <div class="form-item">
-            <label for="name">Name:</label>
-            <input type="text" id="name" name="name" required>
+  <div class="container">
+    <input type="checkbox" id="flip">
+    <div class="cover">
+      <div class="front">
+        <img src="/static/images/frontImg.jpg" alt="">
+        <div class="text">
+          <span class="text-1">Virtual<br> Onboarding</span>
+          <span class="text-2">Let's get connected</span>
         </div>
-        <div class="form-item">
-            <label for="age">Age:</label>
-            <input type="number" id="age" name="age" min="0" required>
+      </div>
+      <div class="back">
+        <img class="backImg" src="/static/images/backImg.jpg" alt="">
+        <div class="text">
+          <span class="text-1">Complete miles of journey <br> with one step</span>
+          <span class="text-2">Let's get started</span>
         </div>
-        <div class="form-item">
-            <label for="phno">Phone Number:</label>
-            <input type="tel" id="phno" name="phno" pattern="[0-9]{10}" required>
-        </div>
-        <div class="form-item">
-            <label for="username">Username:</label>
-            <input type="text" id="username" name="username" required>
-        </div>
-        <div class="form-item">
-            <label for="password">Password:</label>
-            <input type="password" id="password" name="password" required>
-        </div>
-        <div class="form-item">
-            <label for="email">Email:</label>
-            <input type="email" id="email" name="email" required>
-        </div>
-        <div class="form-item">
-            <label for="dob">Date of Birth:</label>
-            <input type="date" id="dob" name="dob" required>
-        </div>
-        <input type="reset" value="Reset">
-        <input type="submit" value="Next">
-        
-    </form>
+      </div>
+    </div>
+    <div class="forms">
+      <div class="form-content">
+          <div class="signup-form">
+              <div class="title">Sign Up</div>
+              <form action="/register/" method="POST"> <!-- Ensure the form action and method are correctly set for your backend -->
+                <div class="input-boxes">
+                  <div class="input-box">
+                      <i class="fas fa-user"></i>
+                      <input type="text" placeholder="Enter your name" name="name" required>
+                  </div>
+                  <div class="input-box">
+                      <i class="fas fa-birthday-cake"></i>
+                      <input type="number" placeholder="Enter your age" name="age" required>
+                  </div>
+                  <div class="input-box">
+                      <i class="fas fa-phone"></i>
+                      <input type="tel" placeholder="Enter your phone number" name="phno" pattern="[0-9]{10}" required>
+                  </div>
+                  <div class="input-box">
+                      <i class="fas fa-user-circle"></i>
+                      <input type="text" placeholder="Enter your username" name="username" required>
+                  </div>
+                  <div class="input-box">
+                      <i class="fas fa-lock"></i>
+                      <input type="password" placeholder="Enter your password" name="password" required>
+                  </div>
+                  <div class="input-box">
+                      <i class="fas fa-envelope"></i>
+                      <input type="email" placeholder="Enter your email" name="email" required>
+                  </div>
+                  <div class="input-box">
+                      <i class="fas fa-calendar-alt"></i>
+                      <input type="date" name="dob" required>
+                  </div>
+                  <div class="button input-box">
+                      <input type="submit" value="Submit">
+                  </div>
+                  <div class="text sign-up-text">Already have an account? <label for="flip">Login Here</label></div>
+                  </div>
+              </form>
+          </div>
+      
+  
+        <div class="login-form">
+          <div class="title">Login</div>
+        <form action="/login/">   
+            <div class="input-boxes">
+              <div class="input-box">
+                <i class="fas fa-phone"></i>
+                <input type="tel" placeholder="Enter your phone number" name="phone" pattern="[0-9]{10}" required>
+            </div>
+            <div class="input-box">
+              <i class="fas fa-lock"></i>
+              <input type="password" placeholder="Enter your password" name="password" required>
+          </div>
+              <div class="button input-box">
+                <input type="submit" value="Sumbit">
+              </div>
+              <div class="text sign-up-text">Already have an account? <label for="flip">Login now</label></div>
+            </div>
+      </form>
+    </div>
+    </div>
+    </div>
+  </div>
 
 
-
- {# SweetAlert2 pop up to check the phone number exists #} 
-    <script>
-        document.querySelector('form').addEventListener('submit', function(e) {
-            e.preventDefault(); // Prevent the default form submission
-        
-            const formData = new FormData(this);
-            fetch('/register/', {
+  <!-- Script for phone number validation and user redirection -->
+  <script>
+    document.querySelectorAll('.signup-form form, .login-form form').forEach(form => {
+        form.addEventListener('submit', function(e) {
+            e.preventDefault(); // Correctly prevent the default form submission
+    
+            const formData = new FormData(this); // 'this' correctly refers to the form
+            const actionUrl = this.getAttribute('action'); // Use the action attribute of the form
+    
+            fetch(actionUrl, {
                 method: 'POST',
                 body: formData
             })
@@ -86,10 +144,9 @@
                 });
             });
         });
-        </script>
-        
-
-
+    });
+    </script>
+    
 
 
 </body>

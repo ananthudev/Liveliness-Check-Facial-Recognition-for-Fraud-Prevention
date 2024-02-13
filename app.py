@@ -122,19 +122,67 @@ def upload_id():
         cur.close()
 
 
+# Login Page Route
+        
+# @app.route('/login')
+# def login():
+
+#     return render_template('login.html')
+
+
+        
+@app.route('/login', methods=['POST'])
+def login():
+    phno = request.form['phone']
+    password = request.form['password']
+    cur = mysql.connection.cursor()
+    result = cur.execute("SELECT * FROM liveness WHERE phno = %s AND password = %s", (phno, password))
+    
+    if result > 0:
+        userDetails = cur.fetchone()
+        session['logged_in'] = True
+        session['username'] = userDetails['username']
+        
+        # Use SweetAlert2 to display a success message
+       
+        session['login_success'] = True
+        
+        return redirect(url_for('id_form'))
+    else:
+        # User not found or password incorrect
+        return render_template('login.html', error="Invalid login credentials")
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 if __name__ == '__main__':
     app.run(debug=True)
 
 
-# #New new for phone number validation
-# @app.route('/validate_phno', methods=['POST'])
-# @app.route('/validate_phno', methods=['POST'])
-# def validate_phno():
-#     phno = request.json['phno']  # Adjusted to handle JSON request
-#     cur = mysql.connection.cursor()
-#     cur.execute("SELECT COUNT(1) FROM liveness WHERE phno = %s", [phno])
-#     exists = cur.fetchone()[0] > 0
-#     return jsonify({'exists': exists})  # Correctly return JSON response
 
 
 
