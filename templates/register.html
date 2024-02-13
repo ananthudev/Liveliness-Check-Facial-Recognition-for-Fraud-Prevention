@@ -9,6 +9,8 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
     <script src="https://kit.fontawesome.com/your_kit_code.js" crossorigin="anonymous"></script>
     <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src = "/static/js/registration.js"></script>
+    <script src = "/static/js/login.js"></script>
 
 
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -77,18 +79,18 @@
   
         <div class="login-form">
           <div class="title">Login</div>
-        <form action="/login/">   
+        <form action="/login/" method="POST">
             <div class="input-boxes">
               <div class="input-box">
                 <i class="fas fa-phone"></i>
-                <input type="tel" placeholder="Enter your phone number" name="phone" pattern="[0-9]{10}" required>
+                <input type="tel" placeholder="Enter your phone number" name="phno" pattern="[0-9]{10}" required>
             </div>
             <div class="input-box">
               <i class="fas fa-lock"></i>
               <input type="password" placeholder="Enter your password" name="password" required>
           </div>
               <div class="button input-box">
-                <input type="submit" value="Sumbit">
+                <input type="submit" value="Login">
               </div>
               <div class="text sign-up-text">Already have an account? <label for="flip">Login now</label></div>
             </div>
@@ -99,53 +101,82 @@
   </div>
 
 
-  <!-- Script for phone number validation and user redirection -->
-  <script>
-    document.querySelectorAll('.signup-form form, .login-form form').forEach(form => {
-        form.addEventListener('submit', function(e) {
-            e.preventDefault(); // Correctly prevent the default form submission
+
+
+
+<!-- Script for handling form submission and displaying SweetAlert pop-ups -->
+<script>
+  document.querySelector('.login-form form').addEventListener('submit', function(e) {
+      e.preventDefault(); // Prevent the default form submission
+
+      const formData = new FormData(this);
+      const actionUrl = this.getAttribute('action');
+
+      fetch(actionUrl, {
+          method: 'POST',
+          body: formData
+      })
+      .then(response => {
+          if (!response.ok) {
+              // Check for specific HTTP status code 401
+              if (response.status === 401) {
+                  // Throw an error for 401 Unauthorized
+                  throw new Error('Invalid Credentials');
+              } else {
+                  // Throw an error for other HTTP error responses
+                  throw new Error('HTTP error, status = ' + response.status);
+              }
+          }
+          return response.json();
+      })
+      .then(data => {
+          if (data.error) {
+              // Display a SweetAlert for invalid credentials
+              Swal.fire({
+                  icon: 'error',
+                  title: 'Oops...',
+                  text: data.error
+              });
+          } else if (data.success) {
+              // Display a SweetAlert for successful login
+              Swal.fire({
+                  icon: 'success',
+                  title: 'Success!',
+                  text: data.success,
+                  timer: 2000,  // Set a timer to automatically close the alert after 2 seconds
+                  showConfirmButton: false
+              }).then(() => {
+                  window.location.href = '/id'; // Redirect to ID page
+              });
+          }
+      })
+      .catch(error => {
+          // Check if the error message is 'Invalid Credentials' (for 401 error)
+          if (error.message === 'Invalid Credentials') {
+              // Display a SweetAlert for 401 Unauthorized
+              Swal.fire({
+                  icon: 'error',
+                  title: 'Oops...',
+                  text: 'Invalid Credentials!'
+              });
+          } else {
+              // Display a SweetAlert for generic error
+              Swal.fire({
+                  icon: 'error',
+                  title: 'Oops...',
+                  text: 'Something went wrong!'
+              });
+          }
+      });
+  });
+</script>
+
+
+
+
+
+
     
-            const formData = new FormData(this); // 'this' correctly refers to the form
-            const actionUrl = this.getAttribute('action'); // Use the action attribute of the form
-    
-            fetch(actionUrl, {
-                method: 'POST',
-                body: formData
-            })
-            .then(response => response.json())
-            .then(data => {
-                if(data.error) {
-                    // User exists, show SweetAlert2 popup
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Oops...',
-                        text: data.error
-                    });
-                } else {
-                    // User registered, redirect or show success message
-                    Swal.fire({
-                        icon: 'success',
-                        title: 'Registered!',
-                        text: 'You have been registered successfully.'
-                    }).then((result) => {
-                        if (result.isConfirmed) {
-                            window.location.href = '/id'; // Redirect to ID form or any other page
-                        }
-                    });
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                // Show error alert
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Oops...',
-                    text: 'Something went wrong!'
-                });
-            });
-        });
-    });
-    </script>
     
 
 

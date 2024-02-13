@@ -122,18 +122,14 @@ def upload_id():
         cur.close()
 
 
-# Login Page Route
+
+
+
+# Login Route
         
-# @app.route('/login')
-# def login():
-
-#     return render_template('login.html')
-
-
-        
-@app.route('/login', methods=['POST'])
+@app.route('/login/', methods=['POST'])
 def login():
-    phno = request.form['phone']
+    phno = request.form['phno'] 
     password = request.form['password']
     cur = mysql.connection.cursor()
     result = cur.execute("SELECT * FROM liveness WHERE phno = %s AND password = %s", (phno, password))
@@ -141,41 +137,12 @@ def login():
     if result > 0:
         userDetails = cur.fetchone()
         session['logged_in'] = True
-        session['username'] = userDetails['username']
-        
-        # Use SweetAlert2 to display a success message
-       
-        session['login_success'] = True
-        
-        return redirect(url_for('id_form'))
+        session['username'] = userDetails[5]
+
+        # Redirect to the ID upload page upon successful login
+        return jsonify({'success': 'Successfully logged in'}), 200
     else:
-        # User not found or password incorrect
-        return render_template('login.html', error="Invalid login credentials")
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+        return jsonify({'error': 'Invalid login credentials'}), 401
 
 
 
