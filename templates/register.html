@@ -1,17 +1,14 @@
 <!DOCTYPE html>
-<!-- Created by CodingLab |www.youtube.com/c/CodingLabYT-->
+
 <html lang="en" dir="ltr">
   <head>
     <meta charset="UTF-8">
-    <!--<title> Login and Registration Form in HTML & CSS | CodingLab </title>-->
+   
     <link rel="stylesheet" href="/static/css/style.css">
     <!-- Fontawesome CDN Link -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
-    <script src="https://kit.fontawesome.com/your_kit_code.js" crossorigin="anonymous"></script>
     <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <script src = "/static/js/registration.js"></script>
-    <script src = "/static/js/login.js"></script>
-
+    <script src="https://kit.fontawesome.com/6a47f490c9.js" crossorigin="anonymous"></script>
 
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
    </head>
@@ -102,82 +99,128 @@
 
 
 
+  // <!-- Script for handling  Registration form submission and displaying SweetAlert pop-ups for Phone number exists -->
+  <script>
+   document.querySelector('.signup-form form').addEventListener('submit', function(e) {
+        e.preventDefault(); // Prevent the default form submission
+  
+        const formData = new FormData(this);
+        const actionUrl = this.getAttribute('action');
+  
+        fetch(actionUrl, {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => {
+            if (!response.ok) throw new Error('Network response was not ok.');
+            return response.json();
+        })
+        .then(data => {
+            if (data.error) {
+                // Display a SweetAlert for error message
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Oops...',
+                    text: data.error
+                });
+            } else if (data.success) {
+                // Display a SweetAlert for successful registration
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Registration Successful',
+                    text: 'You have successfully registered.',
+                    timer: 2000,  // Set a timer to automatically close the alert after 2 seconds
+                    showConfirmButton: false
+                }).then(() => {
+                    window.location.href = '/id'; // Redirect to ID page
+                });
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            // Display a SweetAlert for generic error
+            Swal.fire({
+                icon: 'error',
+                title: 'Oops...',
+                text: 'Phone Number Already Exists Please Login!'
+            });
+        });
+    });
+  </script>
 
 
-<!-- Script for handling form submission and displaying SweetAlert pop-ups -->
+  
+  // <!-- Script for handling Login form submission and Invalid Credentials displaying SweetAlert pop-ups -->
+
 <script>
   document.querySelector('.login-form form').addEventListener('submit', function(e) {
-      e.preventDefault(); // Prevent the default form submission
+    e.preventDefault(); // Prevent the default form submission
 
-      const formData = new FormData(this);
-      const actionUrl = this.getAttribute('action');
+    const formData = new FormData(this);
+    const actionUrl = this.getAttribute('action');
 
-      fetch(actionUrl, {
-          method: 'POST',
-          body: formData
-      })
-      .then(response => {
-          if (!response.ok) {
-              // Check for specific HTTP status code 401
-              if (response.status === 401) {
-                  // Throw an error for 401 Unauthorized
-                  throw new Error('Invalid Credentials');
-              } else {
-                  // Throw an error for other HTTP error responses
-                  throw new Error('HTTP error, status = ' + response.status);
-              }
-          }
-          return response.json();
-      })
-      .then(data => {
-          if (data.error) {
-              // Display a SweetAlert for invalid credentials
-              Swal.fire({
-                  icon: 'error',
-                  title: 'Oops...',
-                  text: data.error
-              });
-          } else if (data.success) {
-              // Display a SweetAlert for successful login
-              Swal.fire({
-                  icon: 'success',
-                  title: 'Success!',
-                  text: data.success,
-                  timer: 2000,  // Set a timer to automatically close the alert after 2 seconds
-                  showConfirmButton: false
-              }).then(() => {
-                  window.location.href = '/id'; // Redirect to ID page
-              });
-          }
-      })
-      .catch(error => {
-          // Check if the error message is 'Invalid Credentials' (for 401 error)
-          if (error.message === 'Invalid Credentials') {
-              // Display a SweetAlert for 401 Unauthorized
-              Swal.fire({
-                  icon: 'error',
-                  title: 'Oops...',
-                  text: 'Invalid Credentials!'
-              });
-          } else {
-              // Display a SweetAlert for generic error
-              Swal.fire({
-                  icon: 'error',
-                  title: 'Oops...',
-                  text: 'Something went wrong!'
-              });
-          }
-      });
-  });
-</script>
-
+    fetch(actionUrl, {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => {
+        if (!response.ok) {
+            // Check for specific HTTP status code 401
+            if (response.status === 401) {
+                // Throw an error for 401 Unauthorized
+                throw new Error('Invalid Credentials');
+            } else {
+                // Throw an error for other HTTP error responses
+                throw new Error('HTTP error, status = ' + response.status);
+            }
+        }
+        return response.json();
+    })
+    .then(data => {
+        if (data.error) {
+            // Display a SweetAlert for invalid credentials
+            Swal.fire({
+                icon: 'error',
+                title: 'Oops...',
+                text: data.error
+            });
+        } else if (data.success) {
+            // Display a SweetAlert for successful login
+            Swal.fire({
+                icon: 'success',
+                title: 'Success!',
+                text: data.success,
+                timer: 2000,  // Set a timer to automatically close the alert after 2 seconds
+                showConfirmButton: false
+            }).then(() => {
+                window.location.href = '/id'; // Redirect to ID page
+            });
+        }
+    })
+    .catch(error => {
+        // Check if the error message is 'Invalid Credentials' (for 401 error)
+        if (error.message === 'Invalid Credentials') {
+            // Display a SweetAlert for 401 Unauthorized
+            Swal.fire({
+                icon: 'error',
+                title: 'Oops...',
+                text: 'Invalid Credentials!'
+            });
+        } else {
+            // Display a SweetAlert for generic error
+            Swal.fire({
+                icon: 'error',
+                title: 'Oops...',
+                text: 'Something went wrong!'
+            });
+        }
+    });
+});
 
 
+</script> 
 
 
-
-    
-    
 
 
 </body>
