@@ -19,7 +19,7 @@
       <div class="front">
         <img src="/static/images/frontImg.jpg" alt="">
         <div class="text">
-          <span class="text-1">Virtual<br> Onboarding</span>
+          <span class="text-1">Virtual<br>KYC Onboarding</span>
           <span class="text-2">Let's get connected</span>
         </div>
       </div>
@@ -99,10 +99,11 @@
 
 
 
-  // <!-- Script for handling  Registration form submission and displaying SweetAlert pop-ups for Phone number exists -->
+  <!-- Script for handling  Registration form submission and displaying SweetAlert pop-ups for Phone number exists -->
   <script>
    document.querySelector('.signup-form form').addEventListener('submit', function(e) {
-        e.preventDefault(); // Prevent the default form submission
+       
+        e.preventDefault(); 
   
         const formData = new FormData(this);
         const actionUrl = this.getAttribute('action');
@@ -150,7 +151,7 @@
 
 
   
-  // <!-- Script for handling Login form submission and Invalid Credentials displaying SweetAlert pop-ups -->
+   <!-- Script for handling Login form submission and Invalid Credentials displaying SweetAlert pop-ups -->
 
 <script>
   document.querySelector('.login-form form').addEventListener('submit', function(e) {

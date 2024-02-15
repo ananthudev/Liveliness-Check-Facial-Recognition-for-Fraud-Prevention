@@ -104,10 +104,22 @@ def upload_id():
 
 
 
-            # Update the step in the liveness table for the username
-            cur.execute("UPDATE liveness SET step = 2 WHERE username = %s", [username])
+             # Retrieve phno for the username from the liveness table
+            cur.execute("SELECT phno FROM liveness WHERE username = %s", [username])
+            phno_result = cur.fetchone()
+
+            if phno_result:
+                phno = phno_result[0]
+                # Update the step in the liveness table using the retrieved phno
+                cur.execute("UPDATE liveness SET step = 2 WHERE phno = %s", [phno])
+            else:
+                mysql.connection.rollback()
+                return "Error: No phone number found for the given username."
+
             mysql.connection.commit()
             return "ID card and profile image uploaded successfully."
+
+
         else:
             # If no face is detected, roll back any file saves and return an error message
             for path in file_paths:
