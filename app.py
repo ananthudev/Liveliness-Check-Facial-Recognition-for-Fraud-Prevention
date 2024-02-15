@@ -117,7 +117,7 @@ def upload_id():
                 return "Error: No phone number found for the given username."
 
             mysql.connection.commit()
-            return "ID card and profile image uploaded successfully."
+            return jsonify({'success': True, 'message': "ID card and profile image uploaded successfully."}), 200
 
 
         else:
@@ -125,11 +125,11 @@ def upload_id():
             for path in file_paths:
                 os.remove(path)  # Remove the saved images as they are not needed
             mysql.connection.rollback()
-            return "Error: No face detected in the uploaded ID card. Please upload a clear ID card image with a visible face."
+            return jsonify({'success': False, 'message': "No face detected in the uploaded ID card. Please upload a clear ID card image with a visible face."}), 400
 
     except Exception as e:
         mysql.connection.rollback()
-        return f"Error: {e}"
+        return jsonify({'success': False, 'message': f"Error: {e}"}), 500
     finally:
         cur.close()
 

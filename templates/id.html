@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Upload ID Card</title>
     <link rel="stylesheet" href="/static/css/id.css">
+    <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 <body>
     <div class="upload-form">
@@ -18,5 +19,58 @@
             <button type="submit">Upload</button>
         </form>
     </div>
+
+
+    
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const form = document.querySelector("form");
+            form.onsubmit = function(event) {
+                event.preventDefault();
+                const formData = new FormData(form);
+        
+                fetch('/id', {
+                    method: 'POST',
+                    body: formData,
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        // If response is not OK, throw the response itself to be handled in the next catch block
+                        throw response;
+                    }
+                    return response.json(); // Parse JSON only if response is OK
+                })
+                .then(data => {
+                    // Handle success
+                    Swal.fire('Success!', data.message, 'success');
+                })
+                .catch(errorResponse => {
+                    // Handle errors
+                    if (errorResponse.json) { // Check if errorResponse has a json method
+                        errorResponse.json().then(errorData => {
+                            // Display specific error message from server
+                            Swal.fire('Error!', errorData.message, 'error');
+                        });
+                    } else {
+                        // Handle other errors (e.g., network error)
+                        console.error('Fetch Error:', errorResponse);
+                        Swal.fire('Error!', 'Something went wrong. Please try again.', 'error');
+                    }
+                });
+            };
+        });
+        
+    </script>
+        
+
+
+
+
+
+
+
+
+
+
 </body>
 </html>
