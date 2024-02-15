@@ -32,6 +32,10 @@ def home():
     return render_template('register.html', step=0)
 
 
+
+
+
+
 #App route for registration and save into database liveness and javascript for phone number exists
 @app.route('/register/', methods=['POST'])
 def register():
@@ -55,11 +59,14 @@ def register():
                      userDetails.get('dob'), userDetails.get('email'), username, 
                      userDetails.get('password')))
         mysql.connection.commit()
+
+       
         return jsonify({'success': True})
     except Exception as e:
         mysql.connection.rollback()
         return jsonify({'error': str(e)}), 500
 
+    
 
 @app.route('/id')
 def id_form():
@@ -118,7 +125,7 @@ def upload_id():
 
             mysql.connection.commit()
             return jsonify({'success': True, 'message': "ID card and profile image uploaded successfully."}), 200
-
+            
 
         else:
             # If no face is detected, roll back any file saves and return an error message
@@ -155,6 +162,45 @@ def login():
         return jsonify({'success': 'Successfully logged in'}), 200
     else:
         return jsonify({'error': 'Invalid login credentials'}), 401
+
+
+# Flask route that takes a mobile number, checks the current step for that number in your database, and returns the step to the client.
+    
+@app.route('/check_step', methods=['POST'])
+def check_step():
+    data = request.json
+    phno = data.get('phno')
+    
+    if not phno:
+        return jsonify({'error': 'Mobile number is required'}), 400
+    
+    cur = mysql.connection.cursor()
+    cur.execute("SELECT step FROM liveness WHERE phno = %s", [phno])
+    result = cur.fetchone()
+    
+    if result:
+        step = result[0]
+        return jsonify({'step': step})
+    else:
+        return jsonify({'error': 'Mobile number not found'}), 404
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

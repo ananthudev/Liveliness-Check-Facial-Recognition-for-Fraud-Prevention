@@ -218,9 +218,47 @@
     });
 });
 
-
 </script> 
 
+<!-- JavaScript to send the mobile number to the server, receive the step, and navigate accordingly -->
+
+<script>
+    function checkStepAndNavigate(phno) {
+        fetch('/check_step', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({phno: phno}),
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.error) {
+                console.error('Error:', data.error);
+                // Handle error (e.g., show an alert or message to the user)
+            } else if (data.step) {
+                // Navigate based on the step
+                switch(data.step) {
+                    case 1:
+                        window.location.href = '/register/'; // Navigate to register page
+                        break;
+                    case 2:
+                        window.location.href = '/id'; // Navigate to ID upload page
+                        break;
+                    // Add more cases as needed for other steps
+                    default:
+                        window.location.href = '/'; // Default navigation
+                }
+            }
+        })
+        .catch((error) => {
+            console.error('Fetch Error:', error);
+        });
+    }
+    
+    
+    </script>
+    
 
 
 
