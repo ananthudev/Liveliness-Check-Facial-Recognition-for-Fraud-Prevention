@@ -63,6 +63,24 @@ button:hover {
     margin-left: auto; /* Keeps the button to the right */
 }
 
+#imagePreview {
+    text-align: center; /* Centers the images within the div */
+    padding: 20px 0; /* Adds padding above and below the images */
+}
+
+#imagePreview img {
+    max-width: 250x; /* Maximum width of the image preview */
+    max-height: 250px; /* Maximum height of the image preview */
+    object-fit: contain; /* This will make sure that the aspect ratio is preserved */
+    display: inline-block; /* Allows the images to be centered within #imagePreview */
+    margin: 10px auto; /* Centers the image horizontally and adds space above and below */
+    border: 1px solid #ccc; /* Adds a light border around the image */
+    box-shadow: 2px 2px 2px #eee; /* Adds a subtle shadow to the image */
+    border-radius: 4px; /* Rounds the corners of the image */
+}
+
+
+
 /* Re-using animations from style.css */
 @keyframes fadeIn { /* Included as is if needed for consistency */ }
 @keyframes popIn { /* Included as is if needed for consistency */ }

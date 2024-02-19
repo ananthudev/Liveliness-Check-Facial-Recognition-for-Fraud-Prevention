@@ -84,7 +84,7 @@ def upload_id():
     files = request.files.getlist("id_images")
 
     if len(files) != 2:
-        return "Please upload exactly two images.", 400
+        return jsonify({'success': False, 'message': "Please upload exactly two images."}), 400
 
     cur = mysql.connection.cursor()
     try:
@@ -121,19 +121,21 @@ def upload_id():
                 cur.execute("UPDATE liveness SET step = 2 WHERE phno = %s", [phno])
             else:
                 mysql.connection.rollback()
-                return "Error: No phone number found for the given username."
+                return jsonify({'success': False, 'message': "No phone number found for the given username."}), 400
+
 
             mysql.connection.commit()
-            return jsonify({'success': True, 'message': "ID card and profile image uploaded successfully."}), 200
-            
-
+            return jsonify({
+                'success': True, 
+                'message': "ID card and profile image uploaded successfully.",
+                'frontImageUrl': url_for('static', filename=f'uploaded_images/{username}_front.png'),
+                'backImageUrl': url_for('static', filename=f'uploaded_images/{username}_back.png')
+            }), 200
         else:
-            # If no face is detected, roll back any file saves and return an error message
             for path in file_paths:
-                os.remove(path)  # Remove the saved images as they are not needed
+                os.remove(path)  # Assuming the path is absolute
             mysql.connection.rollback()
             return jsonify({'success': False, 'message': "No face detected in the uploaded ID card. Please upload a clear ID card image with a visible face."}), 400
-
     except Exception as e:
         mysql.connection.rollback()
         return jsonify({'success': False, 'message': f"Error: {e}"}), 500

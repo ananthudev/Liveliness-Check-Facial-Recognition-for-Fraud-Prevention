@@ -21,7 +21,7 @@ def save_base64_to_image(base64_str, username, image_type):
         print(f"Error decoding base64 or opening image: {e}")
         return None  # or handle the error as needed
 
-    save_path = 'uploaded_images'
+    save_path = 'static/uploaded_images'
     os.makedirs(save_path, exist_ok=True)
 
     # Construct file path

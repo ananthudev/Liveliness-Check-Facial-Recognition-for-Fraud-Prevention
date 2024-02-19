@@ -9,82 +9,81 @@
 </head>
 <body>
     <div class="upload-form">
-        <h2>Upload ID Card</h2>
-        <form action="/id" method="post" enctype="multipart/form-data">
+        <h2 id="formHeading">Upload ID Card</h2>
+
+        <form id="uploadForm" enctype="multipart/form-data">
             <div>
                 <label for="id_images">Select ID Card Images:</label>
                 <input type="file" id="id_images" name="id_images" accept="image/png, image/jpeg" multiple required>
                 <small id="uploadMessage">Please select both the front and back images of your ID card.</small>
-
             </div>
             <div class="button-container">
-                <button type="submit">Upload</button>
-                <button type="button" id="nextStepButton" class="next-step" style="display:none;">Next Step</button>
-
+                <button type="button" id="uploadButton">Upload</button>
             </div>
         </form>
+        <!-- Placeholder for image previews -->
+        <div id="imagePreview" style="display: none;">
+            <img src="" id="frontImagePreview" style="max-width: 100%; height: auto;" />
+            <img src="" id="backImagePreview" style="max-width: 100%; height: auto;" />
+        </div>
+        <!-- Next Step button is outside the form to not trigger form submission again -->
+        <button type="button" id="nextStepButton" class="next-step" style="display:none;" onclick="window.location.href='templates/liveness.html';">Next Step</button>
     </div>
 
-
-    
     <script>
         document.addEventListener("DOMContentLoaded", function() {
-            const form = document.querySelector("form");
-            form.onsubmit = function(event) {
+            const uploadButton = document.getElementById('uploadButton');
+            uploadButton.onclick = function(event) {
                 event.preventDefault();
-                const formData = new FormData(form);
-        
+                const formData = new FormData(document.getElementById('uploadForm'));
+                Swal.fire({
+                    title: 'Uploading...',
+                    html: 'Please wait while your images are being uploaded',
+                    allowOutsideClick: false,
+                    didOpen: () => {
+                        Swal.showLoading();
+                    },
+                });
                 fetch('/id', {
                     method: 'POST',
                     body: formData,
                 })
                 .then(response => {
                     if (!response.ok) {
-                        // If response is not OK, throw the response itself to be handled in the next catch block
                         throw response;
                     }
-                    return response.json(); // Parse JSON only if response is OK
+                    return response.json();
                 })
                 .then(data => {
-                    // Handle success
-                    Swal.fire('Success!', data.message, 'success');
+                    Swal.close(); // Close the loading animation
+                    Swal.fire('Success!', 'ID card uploaded successfully.', 'success');
+                    
+                    // Update the heading text
+                    document.getElementById('formHeading').textContent = 'ID Card Uploaded Successfully';
         
-                    // Make the "Next Step" button visible
+                    // Hide the form elements related to upload
+                    document.getElementById('uploadForm').style.visibility = 'hidden'; // Hides form but keeps space
+                    document.getElementById('uploadMessage').style.display = 'none'; // Hide message
+        
+                    // Assuming image paths are returned from the server
+                    // These lines need actual URLs returned from the server in 'data'
+                    document.getElementById('frontImagePreview').src = data.frontImageUrl;
+                    document.getElementById('backImagePreview').src = data.backImageUrl;
+                    document.getElementById('imagePreview').style.display = 'block';
+        
+                    // Show the "Next Step" button
                     document.getElementById('nextStepButton').style.display = 'block';
-        
-                    // Update the message
-                    document.getElementById('uploadMessage').textContent = 'ID card uploaded. Please click Next Step.';
                 })
                 .catch(errorResponse => {
-                    // Handle errors
-                    if (errorResponse.json) { // Check if errorResponse has a json method
-                        errorResponse.json().then(errorData => {
-                            // Display specific error message from server
-                            Swal.fire('Error!', errorData.message, 'error');
-                        });
-                    } else {
-                        // Handle other errors (e.g., network error)
-                        console.error('Fetch Error:', errorResponse);
-                        Swal.fire('Error!', 'Something went wrong. Please try again.', 'error');
-                    }
+                    Swal.close();
+                    errorResponse.json().then(errorData => {
+                        Swal.fire('Error!', errorData.message, 'error');
+                    });
                 });
             };
         });
+        </script>
         
-        
-        
-        
-    </script>
-        
-
-
-
-
-
-
-
-
-
-
+    
 </body>
 </html>

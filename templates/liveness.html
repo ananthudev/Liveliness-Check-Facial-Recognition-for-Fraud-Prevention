@@ -1,11 +1,25 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Liveness Detection</title>
 </head>
 <body>
-    <p>Liveness Check</p>
+    <video id="video" width="720" height="560" autoplay></video>
+    <button id="startButton">Click Here to Start Facial Match</button>
+    <script>
+        const video = document.getElementById('video');
+        const startButton = document.getElementById('startButton');
+
+        // Prompt user to start video capture
+        startButton.addEventListener('click', async () => {
+            if (navigator.mediaDevices.getUserMedia) {
+                const stream = await navigator.mediaDevices.getUserMedia({ video: {} });
+                video.srcObject = stream;
+            }
+            // Initialize facial recognition and liveness detection here
+        });
+
+        // Add functionality to dynamically display instructions and capture image upon criteria met
+    </script>
 </body>
 </html>
