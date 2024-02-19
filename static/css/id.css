@@ -16,7 +16,7 @@ body {
     color: #000; /* Text color for the form */
 }
 h2 {
-    color: #000; /* Ensuring text color is visible on light background */
+    color: #000;
 }
 label {
     display: block;
@@ -25,8 +25,12 @@ label {
 input[type="file"] {
     margin-bottom: 20px;
 }
+.button-container {
+    display: flex;
+    justify-content: space-between; /* Align buttons on opposite sides */
+    width: 100%; /* Ensure container takes full width of form */
+}
 button {
-    display: inline-block;
     padding: 10px 20px;
     background-color: #32cd32; /* Green background */
     color: #ffffff; /* White text color */
@@ -37,6 +41,11 @@ button {
 }
 button:hover {
     background-color: #28a745; /* Darker green */
+}
+
+/* Adjustments for the "Next Step" button */
+.next-step {
+    margin-left: auto; /* Pushes the button to the right */
 }
 
 /* Existing animations */
