@@ -14,11 +14,13 @@
             <div>
                 <label for="id_images">Select ID Card Images:</label>
                 <input type="file" id="id_images" name="id_images" accept="image/png, image/jpeg" multiple required>
-                <small>Please select both the front and back images of your ID card.</small>
+                <small id="uploadMessage">Please select both the front and back images of your ID card.</small>
+
             </div>
             <div class="button-container">
                 <button type="submit">Upload</button>
-                <button type="submit" class="next-step">Next Step</button>
+                <button type="button" id="nextStepButton" class="next-step" style="display:none;">Next Step</button>
+
             </div>
         </form>
     </div>
@@ -46,6 +48,12 @@
                 .then(data => {
                     // Handle success
                     Swal.fire('Success!', data.message, 'success');
+        
+                    // Make the "Next Step" button visible
+                    document.getElementById('nextStepButton').style.display = 'block';
+        
+                    // Update the message
+                    document.getElementById('uploadMessage').textContent = 'ID card uploaded. Please click Next Step.';
                 })
                 .catch(errorResponse => {
                     // Handle errors
@@ -62,6 +70,9 @@
                 });
             };
         });
+        
+        
+        
         
     </script>
         
