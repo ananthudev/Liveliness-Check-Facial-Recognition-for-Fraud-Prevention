@@ -1,54 +1,69 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@200;300;400;500;600;700&display=swap');
+
 body {
     display: flex;
     justify-content: center;
     align-items: center;
     height: 100vh;
-    font-family: 'Arial', sans-serif;
-    background-color: #1e90ff; /* Light blue background */
-    color: #ffffff; /* White text color */
+    font-family: 'Poppins', sans-serif; /* Updated to Poppins to match style.css */
+    background-color: #7d2ae8; /* Matching purple background */
+    color: #ffffff;
     margin: 0;
 }
+
 .upload-form {
     background-color: #ffffff;
     padding: 20px;
     border-radius: 10px;
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
-    color: #000; /* Text color for the form */
+    box-shadow: 0 5px 10px rgba(0,0,0,0.2); /* Updated to match style.css shadow */
+    color: #333; /* Updated to a softer black for text color */
 }
+
 h2 {
-    color: #000;
+    color: #333; /* Consistent with the text color update */
+    font-weight: 600; /* Making it slightly bolder to match the aesthetics of Poppins */
 }
+
 label {
     display: block;
     margin-bottom: 10px;
+    font-weight: 500; /* Slightly bolder label for better readability */
 }
+
 input[type="file"] {
     margin-bottom: 20px;
+    border: 2px solid rgba(0,0,0,0.2); /* Added to give a slight border matching the style.css inputs */
+    padding: 5px; /* Added padding for better visual */
+    border-radius: 5px; /* Added border-radius for consistency */
 }
+
 .button-container {
     display: flex;
-    justify-content: space-between; /* Align buttons on opposite sides */
-    width: 100%; /* Ensure container takes full width of form */
+    justify-content: space-between;
+    width: 100%;
 }
+
 button {
     padding: 10px 20px;
-    background-color: #32cd32; /* Green background */
-    color: #ffffff; /* White text color */
+    background-color: #7d2ae8; /* Updated button color to match the background */
+    color: #ffffff;
     border: none;
-    border-radius: 5px;
+    border-radius: 6px; /* Matching the border-radius from style.css */
     cursor: pointer;
     transition: background-color 0.3s;
+    font-weight: 500; /* Consistency in font weight */
 }
+
 button:hover {
-    background-color: #28a745; /* Darker green */
+    background-color: #5b13b9; /* Darker shade on hover to match style.css */
 }
 
 /* Adjustments for the "Next Step" button */
 .next-step {
-    margin-left: auto; /* Pushes the button to the right */
+    margin-left: auto; /* Keeps the button to the right */
 }
 
-/* Existing animations */
-@keyframes fadeIn { /* Same as before */ }
-@keyframes popIn { /* Same as before */ }
-@keyframes colorChange { /* Same as before */ }
+/* Re-using animations from style.css */
+@keyframes fadeIn { /* Included as is if needed for consistency */ }
+@keyframes popIn { /* Included as is if needed for consistency */ }
+@keyframes colorChange { /* Included as is if needed for consistency */ }
