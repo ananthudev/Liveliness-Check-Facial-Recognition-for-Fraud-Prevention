@@ -5,79 +5,126 @@ body {
     justify-content: center;
     align-items: center;
     height: 100vh;
-    font-family: 'Poppins', sans-serif; /* Updated to Poppins to match style.css */
-    background-color: #7d2ae8; /* Matching purple background */
+    font-family: 'Poppins', sans-serif;
+    background-color: #7d2ae8;
     color: #ffffff;
     margin: 0;
+    overflow: auto; /* Adjusted to handle overflow */
+}
+
+.container {
+    display: flex;
+    flex-direction: row; /* Ensure this is set to row to align children horizontally */
+    max-width: 50%;
+    box-shadow: 0 5px 10px rgba(0,0,0,0.2);
+    border-radius: 10px;
+    overflow: hidden;
+    background-color: #ffffff;
+}
+
+small {
+    white-space: nowrap; /* Add this line to keep the message in one line */
 }
 
 .upload-form {
-    background-color: #ffffff;
     padding: 20px;
-    border-radius: 10px;
-    box-shadow: 0 5px 10px rgba(0,0,0,0.2); /* Updated to match style.css shadow */
-    color: #333; /* Updated to a softer black for text color */
+    /* max-width: 90%; */
+    flex-basis: 50%; /* Allocate space for the form */
+    color: #333;
 }
 
+#imagePreview {
+    display: flex; /* This ensures the flex container is active. */
+    justify-content: start; /* This will space out the images evenly. */
+    gap: 6px;
+    align-items: center; /* This aligns items vertically in the center. */
+    flex-wrap: nowrap; /* Prevents wrapping of items to ensure horizontal alignment. */
+    display: none; /* Initially hidden to only show when images are selected */
+    flex-basis: 50%; /* Allocate space for image previews next to the form */
+    padding: 20px;
+}
+
+#imagePreview img {
+    width: auto; /* Adjust width to content */
+    max-width: 90%; /* Ensure image does not exceed its container width */
+    max-height: 200px; /* Limit image height for a uniform display */
+    object-fit: cover; /* Ensure images cover their respective areas without distorting */
+}
+
+.static-image-container {
+    flex-basis: 50%; /* Allocate space next to the form */
+    display: flex;
+    justify-content: center; /* Center the image horizontally */
+    align-items: center; /* Center the image vertically */
+    padding: 20px;
+}
+
+.static-image-container img {
+    max-width: 200px; /* Ensure image does not exceed its container width */
+    max-height: 200px; /* Set a maximum height for the image */
+    object-fit: contain; /* Ensure the full image is visible */
+}
+
+
+
 h2 {
-    color: #333; /* Consistent with the text color update */
-    font-weight: 600; /* Making it slightly bolder to match the aesthetics of Poppins */
+    color: #333;
+    font-weight: 600;
 }
 
 label {
     display: block;
     margin-bottom: 10px;
-    font-weight: 500; /* Slightly bolder label for better readability */
+    font-weight: 500;
 }
 
 input[type="file"] {
     margin-bottom: 20px;
-    border: 2px solid rgba(0,0,0,0.2); /* Added to give a slight border matching the style.css inputs */
-    padding: 5px; /* Added padding for better visual */
-    border-radius: 5px; /* Added border-radius for consistency */
+    border: 2px solid rgba(0,0,0,0.2);
+    padding: 5px;
+    border-radius: 5px;
 }
 
 .button-container {
     display: flex;
     justify-content: space-between;
-    width: 100%;
 }
 
 button {
     padding: 10px 20px;
-    background-color: #7d2ae8; /* Updated button color to match the background */
+    background-color: #7d2ae8;
     color: #ffffff;
     border: none;
-    border-radius: 6px; /* Matching the border-radius from style.css */
+    border-radius: 6px;
     cursor: pointer;
     transition: background-color 0.3s;
-    font-weight: 500; /* Consistency in font weight */
+    font-weight: 500;
 }
 
 button:hover {
-    background-color: #5b13b9; /* Darker shade on hover to match style.css */
+    background-color: #5b13b9;
 }
 
-/* Adjustments for the "Next Step" button */
 .next-step {
-    margin-left: auto; /* Keeps the button to the right */
+    margin-left: auto; /* Adjusted */
 }
 
-#imagePreview {
-    text-align: center; /* Centers the images within the div */
-    padding: 20px 0; /* Adds padding above and below the images */
+/* Optional: Responsive adjustments */
+@media (max-width: 768px) {
+    .container {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .upload-form, #imagePreview {
+        flex-basis: 100%;
+    }
+
+    #imagePreview img {
+        max-width: 50%; /* Adjust size for smaller screens */
+    }
 }
 
-#imagePreview img {
-    max-width: 250x; /* Maximum width of the image preview */
-    max-height: 250px; /* Maximum height of the image preview */
-    object-fit: contain; /* This will make sure that the aspect ratio is preserved */
-    display: inline-block; /* Allows the images to be centered within #imagePreview */
-    margin: 10px auto; /* Centers the image horizontally and adds space above and below */
-    border: 1px solid #ccc; /* Adds a light border around the image */
-    box-shadow: 2px 2px 2px #eee; /* Adds a subtle shadow to the image */
-    border-radius: 4px; /* Rounds the corners of the image */
-}
 
 
 

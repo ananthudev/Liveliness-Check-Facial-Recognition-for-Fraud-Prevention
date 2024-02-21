@@ -187,6 +187,19 @@ def check_step():
         return jsonify({'error': 'Mobile number not found'}), 404
 
 
+#Liveness flask route
+@app.route('/liveness')
+def liveness():
+    # Ensure the user is logged in or has passed the required step to access this page
+    if 'username' not in session:
+        return redirect(url_for('home'))
+    return render_template('liveliness.html')
+
+
+
+
+
+
 
 
 

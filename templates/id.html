@@ -8,32 +8,97 @@
     <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 <body>
-    <div class="upload-form">
-        <h2 id="formHeading">Upload ID Card</h2>
-
-        <form id="uploadForm" enctype="multipart/form-data">
-            <div>
-                <label for="id_images">Select ID Card Images:</label>
-                <input type="file" id="id_images" name="id_images" accept="image/png, image/jpeg" multiple required>
-                <small id="uploadMessage">Please select both the front and back images of your ID card.</small>
-            </div>
-            <div class="button-container">
-                <button type="button" id="uploadButton">Upload</button>
-            </div>
-        </form>
-        <!-- Placeholder for image previews -->
-        <div id="imagePreview" style="display: none;">
-            <img src="" id="frontImagePreview" style="max-width: 100%; height: auto;" />
-            <img src="" id="backImagePreview" style="max-width: 100%; height: auto;" />
+    <!-- Container for the form and image previews -->
+    <div class="container">
+        <!-- Upload form section -->
+        <div class="upload-form">
+            <h2 id="formHeading">Upload ID Card</h2>
+            <form id="uploadForm" enctype="multipart/form-data">
+                <!-- File input for image selection -->
+                <div>
+                    <label for="id_images">Select ID Card Images:</label>
+                    <input type="file" id="id_images" name="id_images" accept="image/png, image/jpeg" multiple required>
+                    <small id="uploadMessage">Please select both the front and back images of your ID card.</small>
+                </div>
+                <div class="button-container">
+                    <!-- Upload button triggers the upload process -->
+                    <button type="button" id="uploadButton">Upload</button>
+                    <!-- Reset button to clear selections and hide previews -->
+                    <button type="button" id="resetButton" style="display:none;">Reset</button>
+                </div>
+            </form>
         </div>
-        <!-- Next Step button is outside the form to not trigger form submission again -->
-        <button type="button" id="nextStepButton" class="next-step" style="display:none;" onclick="window.location.href='templates/liveness.html';">Next Step</button>
+        <!-- Container for image previews -->
+        <div id="imagePreview">
+            <img src="" id="frontImagePreview" alt="Front ID Preview" />
+            <img src="" id="backImagePreview" alt="Back ID Preview" />
+        </div>
+        <!-- Inside the .container div, after the #imagePreview div -->
+        <div id="staticImageContainer" class="static-image-container">
+            <img src="static\images\id card photo.png" alt="id card" id="staticImage" />
+        </div>
+
     </div>
 
+    <!-- Script for handling image preview, upload, and reset functionality -->
     <script>
         document.addEventListener("DOMContentLoaded", function() {
+            // Grabbing elements from the DOM
+            const idImagesInput = document.getElementById('id_images');
+            const uploadMessage = document.getElementById('uploadMessage');
+            const resetButton = document.getElementById('resetButton');
+            const imagePreview = document.getElementById('imagePreview');
+            const frontImagePreview = document.getElementById('frontImagePreview');
+            const backImagePreview = document.getElementById('backImagePreview');
+        
+            // Listener for file input change
+            idImagesInput.addEventListener('change', function() {
+                const files = this.files;
+                // Check for exactly 2 files
+                if (files.length !== 2) {
+                    Swal.fire('Error!', 'Please select exactly two images.', 'error');
+                    this.value = '';
+                    return;
+                }
+                document.getElementById('staticImageContainer').style.display = 'none'; // Hide the static image
+                imagePreview.style.display = 'flex'; // Show the preview container
+                resetButton.style.display = 'block'; // Show the reset button
+                uploadMessage.style.display = 'none'; // Hide the instruction message
+                
+                // Preview the first image
+                const reader1 = new FileReader();
+                reader1.onload = function(e) {
+                    frontImagePreview.src = e.target.result;
+                    frontImagePreview.style.display = 'block';
+                };
+                reader1.readAsDataURL(files[0]);
+        
+                // Preview the second image
+                const reader2 = new FileReader();
+                reader2.onload = function(e) {
+                    backImagePreview.src = e.target.result;
+                    backImagePreview.style.display = 'block';
+                };
+                reader2.readAsDataURL(files[1]);
+            });
+
+            // Reset button functionality
+            resetButton.addEventListener('click', function() {
+                document.getElementById('uploadForm').reset();
+                imagePreview.style.display = 'none'; // Hide the image previews
+                document.getElementById('staticImageContainer').style.display = 'flex'; // Show the static image again
+                uploadMessage.style.display = 'block'; // Show the instruction message
+                this.style.display = 'none'; // Hide the reset button
+                frontImagePreview.style.display = 'none'; // Hide the front image preview
+                backImagePreview.style.display = 'none'; // Hide the back image preview
+                frontImagePreview.src = ''; // Clear the src for the front image preview
+                backImagePreview.src = ''; // Clear the src for the back image preview
+               
+            });
+        
+            // Upload button functionality
             const uploadButton = document.getElementById('uploadButton');
-            uploadButton.onclick = function(event) {
+            uploadButton.addEventListener('click', function(event) {
                 event.preventDefault();
                 const formData = new FormData(document.getElementById('uploadForm'));
                 Swal.fire({
@@ -55,34 +120,28 @@
                     return response.json();
                 })
                 .then(data => {
-                    Swal.close(); // Close the loading animation
-                    Swal.fire('Success!', 'ID card uploaded successfully.', 'success');
-                    
-                    // Update the heading text
-                    document.getElementById('formHeading').textContent = 'ID Card Uploaded Successfully';
-        
-                    // Hide the form elements related to upload
-                    document.getElementById('uploadForm').style.visibility = 'hidden'; // Hides form but keeps space
-                    document.getElementById('uploadMessage').style.display = 'none'; // Hide message
-        
-                    // Assuming image paths are returned from the server
-                    // These lines need actual URLs returned from the server in 'data'
-                    document.getElementById('frontImagePreview').src = data.frontImageUrl;
-                    document.getElementById('backImagePreview').src = data.backImageUrl;
-                    document.getElementById('imagePreview').style.display = 'block';
-        
-                    // Show the "Next Step" button
-                    document.getElementById('nextStepButton').style.display = 'block';
+                    // On successful upload, show success message with a "Next Step" button
+                    Swal.fire({
+                        title: 'Success!',
+                        html: 'ID card uploaded successfully.<br>We will take you to the Liveliness Check.<br>Please click "Next Step" to continue.',
+                        icon: 'success',
+                        icon: 'success',
+                        confirmButtonText: 'Next Step',
+                        preConfirm: () => {
+                            window.location.href = '/liveness'; // Matches the Flask route
+                        }
+                    });
                 })
                 .catch(errorResponse => {
-                    Swal.close();
+                    // On failure, show error message
                     errorResponse.json().then(errorData => {
                         Swal.fire('Error!', errorData.message, 'error');
                     });
                 });
-            };
+            });
         });
         </script>
+        
         
     
 </body>

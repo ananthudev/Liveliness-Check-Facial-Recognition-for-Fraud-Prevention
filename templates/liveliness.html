@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Liveness Detection</title>
+    <style>
+        .container{
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100vh;
+            background-color: beige;
+            color: black;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    
+    <div class="container">
+    <a href="/templates/liveliness.html"><input type="button" value="rerun"></a>
+        <h1>Liveliness Checking</h1>
+        <canvas id="canvas" width="640px" height="480px"></canvas>
+    </div>
+
+
+<script >
+
+    var ctx = document.getElementById("canvas").getContext('2d');
+    var img = new Image();
+    img.src = "{{ url_for('video_feed') }}";
+
+    function refreshCanvas(){
+        ctx.drawImage(img, 0, 0);
+        console.log('calling.....')
+    };
+    window.setInterval("refreshCanvas()", 1);
+
+</script>
+</body>
+</html>
