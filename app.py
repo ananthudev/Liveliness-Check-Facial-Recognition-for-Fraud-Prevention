@@ -1,9 +1,12 @@
+import datetime
 from flask import Flask, render_template, request, redirect, url_for, session, jsonify
 from flask_mysqldb import MySQL
 from PIL import Image # pillow for image manipulatipon, converting to image to base 64 and vice versa
 import io
 import os
+import random
 import base64 # module for converting raw image into base64 string
+import pytesseract
 
 
 from image_convert import convert_image_to_base64, save_base64_to_image
@@ -188,12 +191,73 @@ def check_step():
 
 
 #Liveness flask route
-@app.route('/liveness')
-def liveness():
-    # Ensure the user is logged in or has passed the required step to access this page
-    if 'username' not in session:
-        return redirect(url_for('home'))
-    return render_template('liveliness.html')
+@app.route('/generate_otp')
+def generate_otp():
+    # Generate a random 4-digit OTP
+    otp = random.randint(1000, 1001)
+    # Store the OTP in the session for later verification
+    session['otp'] = otp
+
+    # Assume 'username' is available in the session
+    username = session.get('username')
+    if username:
+        cur = mysql.connection.cursor()
+        try:
+            # Save the OTP in the database for the given user
+            cur.execute("UPDATE liveness SET otp = %s WHERE username = %s", (otp, username))
+            mysql.connection.commit()
+        except Exception as e:
+            print(e)
+            mysql.connection.rollback()
+
+    return render_template('otp_display.html', otp=otp)
+
+
+
+@app.route('/verify_otp', methods=['POST'])
+def verify_otp():
+    if 'image' not in request.files:
+        return jsonify({'error': 'No image uploaded'}), 400
+
+    username = session.get('username')
+    if not username:
+        return jsonify({'error': 'Session or username missing'}), 400
+
+    image_file = request.files['image']
+    image_base64 = convert_image_to_base64(Image.open(image_file.stream))
+    # Save in the 'liveness' directory
+    image_path = save_base64_to_image(image_base64, username, 'liveliness', directory="liveness")
+
+    if not image_path:
+        return jsonify({'error': 'Image saving failed'}), 500
+
+    # Save the image path to the database immediately after it's generated
+    cur = mysql.connection.cursor()
+    try:
+        cur.execute("UPDATE liveness SET liveness_image_path = %s WHERE username = %s", (image_path, username))
+        mysql.connection.commit()
+    except Exception as e:
+        mysql.connection.rollback()
+        return jsonify({'error': 'Failed to update image path in database'}), 500
+
+    # Proceed with OTP verification
+    try:
+        extracted_text = pytesseract.image_to_string(Image.open(os.path.join('static', image_path)))
+        otp = session.get('otp')
+
+        if str(otp) in extracted_text:
+            # Update status to 'OTP verified' if OTP matches
+            cur.execute("UPDATE liveness SET status = 'OTP verified' WHERE username = %s", [username])
+            mysql.connection.commit()
+            return jsonify({'success': True, 'message': 'Liveliness check passed.'})
+        else:
+            # Update status to 'OTP failed' if OTP does not match
+            cur.execute("UPDATE liveness SET status = 'OTP failed' WHERE username = %s", [username])
+            mysql.connection.commit()
+            return jsonify({'success': False, 'message': 'OTP does not match.'})
+    except Exception as e:
+        mysql.connection.rollback()  # Roll back in case of any exception
+        return jsonify({'error': str(e)}), 500
 
 
 

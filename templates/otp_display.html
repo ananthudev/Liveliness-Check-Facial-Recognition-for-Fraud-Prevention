@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Liveness Check</title>
+    <!-- Add your CSS links here -->
+    <link rel="stylesheet" href="/static/css/live.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
+</head>
+<body>
+    <div class="liveness-container">
+        <div class="instructions">
+            <p>Write the below code on a piece of paper and hold it in front of the camera:</p>
+            <h1 id="otpDisplay">{{ otp }}</h1>
+            <div id="timer">01:00</div> <!-- Timer display -->
+        </div>
+        <div class="otp-image">
+            <img src="/static/images/OZ5BKSK4_IPV.png" alt="Example Image">
+        </div>
+        <div class="camera-feed">
+            <video id="cameraStream" autoplay></video>
+            <img id="capturedImage" src="" alt="Captured Image" style="display:none;">
+            <button id="captureButton">Capture Image</button>
+            <button id="saveButton">Save </button>
+            <button id="redoButton">Redo Verification</button>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const video = document.getElementById('cameraStream');
+            const captureButton = document.getElementById('captureButton');
+            const saveButton = document.getElementById('saveButton');
+            const redoButton = document.getElementById('redoButton');
+            const capturedImage = document.getElementById('capturedImage');
+            const canvas = document.createElement('canvas');
+            document.body.appendChild(canvas); // Ensure canvas is part of the DOM for toDataURL to work
+            canvas.style.display = 'none'; // Hide the canvas element
+            const context = canvas.getContext('2d');
+            let stream = null;
+    
+            // Access the user's camera
+            navigator.mediaDevices.getUserMedia({ video: true })
+                .then(function(mediaStream) {
+                    stream = mediaStream;
+                    video.srcObject = mediaStream;
+                    video.play();
+                }).catch(function(error) {
+                    console.error("Error accessing the camera: ", error);
+                });
+    
+            // Timer for OTP validity
+            let timer = 60;
+            const timerElement = document.getElementById('timer');
+            let countdown = setInterval(function() {
+                let seconds = timer % 60;
+                timerElement.textContent = `00:${seconds < 10 ? '0' : ''}${seconds}`;
+                if (timer <= 0) {
+                    clearInterval(countdown);
+                }
+                timer--;
+            }, 1000);
+    
+            // Capture the image on button click
+            captureButton.addEventListener('click', function() {
+                canvas.width = video.videoWidth;
+                canvas.height = video.videoHeight;
+                context.drawImage(video, 0, 0, canvas.width, canvas.height);
+                const imageBase64 = canvas.toDataURL('image/png');
+                capturedImage.src = imageBase64;
+    
+                // Show the captured image and hide the video stream
+                capturedImage.style.display = 'block';
+                video.style.display = 'none';
+    
+                // Adjust visibility of buttons
+                captureButton.style.display = 'none';
+                saveButton.style.display = 'inline';
+                redoButton.style.display = 'inline';
+            });
+    
+            // Redo the capture on button click
+            redoButton.addEventListener('click', function() {
+                capturedImage.style.display = 'none';
+                video.style.display = 'block';
+    
+                // Reset button visibility
+                captureButton.style.display = 'inline';
+                saveButton.style.display = 'none';
+                redoButton.style.display = 'none';
+            });
+    
+            // Save the image and send it to the server for verification
+            saveButton.addEventListener('click', function() {
+                canvas.toBlob(function(blob) {
+                    let formData = new FormData();
+                    formData.append('image', blob, 'liveliness.png');
+    
+                    // Display SweetAlert2 loading dialog
+                    Swal.fire({
+                        title: 'Verifying...',
+                        text: 'Please wait while we verify your OTP.',
+                        didOpen: () => {
+                            Swal.showLoading()
+                        },
+                        allowOutsideClick: false
+                    });
+    
+                    fetch('/verify_otp', {
+                        method: 'POST',
+                        body: formData
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        Swal.close(); // Close the loading dialog
+                        if(data.success) {
+                            Swal.fire('Success', 'Verification complete', 'success');
+                        } else {
+                            Swal.fire('Failed', data.message, 'error');
+                        }
+                    })
+                    .catch(error => {
+                        Swal.fire('Error', 'Verification failed: ' + error.message, 'error');
+                        console.error('Error:', error);
+                    });
+                }, 'image/png');
+            });
+        });
+    </script>
+        
+</body>
+</html>
+
+
