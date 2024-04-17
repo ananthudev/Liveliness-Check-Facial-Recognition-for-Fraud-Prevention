@@ -220,6 +220,7 @@ def generate_otp():
 
 
 
+#Liveness image capture and extracting face route
 
 @app.route('/verify_otp', methods=['POST'])
 def verify_otp():
@@ -233,10 +234,12 @@ def verify_otp():
 
         image_file = request.files['image']
 
+        # Save the uploaded image locally
         image = Image.open(image_file)
         image_base64 = convert_image_to_base64(image)
         image_path = save_base64_to_image(image_base64, username, 'liveness', directory='liveness')
 
+        # Update the database with the image path
         cur = mysql.connection.cursor()
         try:
             cur.execute("UPDATE liveness SET liveness_image_path = %s WHERE username = %s", (image_path, username))
@@ -245,7 +248,24 @@ def verify_otp():
             logger.error(f"Error updating liveness image path: {e}")
             mysql.connection.rollback()
 
-        return jsonify({'success': True, 'image_path': image_path})
+        # Extract the face from the saved image
+        face_base64 = extract_face_and_return_filepath(image_path, username)
+
+        if face_base64:
+            # Save the extracted face image locally
+            face_path = save_base64_to_image(face_base64, username, 'liveness_profile', directory='liveness')
+
+            # Update the database with the face image path
+            try:
+                cur.execute("UPDATE liveness SET liveness_profile = %s WHERE username = %s", (face_path, username))
+                mysql.connection.commit()
+            except Exception as e:
+                logger.error(f"Error updating liveness profile image path: {e}")
+                mysql.connection.rollback()
+
+            return jsonify({'success': True, 'image_path': image_path, 'face_path': face_path})
+        else:
+            return jsonify({'error': 'No face detected in the uploaded image'}), 400
 
     except Exception as e:
         logger.error(f"An error occurred: {e}")

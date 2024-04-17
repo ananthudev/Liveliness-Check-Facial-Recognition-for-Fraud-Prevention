@@ -98,7 +98,7 @@ saveButton.addEventListener('click', function() {
             return response.json();
         }).then(data => {
             if (data.success) {
-                Swal.fire('Success', 'Face extracted and saved locally successfully.', 'success');
+                Swal.fire('Success', 'Face extracted and Liveness Check Completed Successfully.', 'success');
             } else {
                 Swal.fire('Error', 'Failed to save face locally.', 'error');
             }
