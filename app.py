@@ -7,6 +7,8 @@ import os
 import random
 import base64 # module for converting raw image into base64 string
 import pytesseract
+import tempfile
+import logging
 
 
 from image_convert import convert_image_to_base64, save_base64_to_image
@@ -17,6 +19,9 @@ from face_extractor import extract_face_and_return_filepath
 
 app = Flask(__name__)
 
+# Set up logging
+logging.basicConfig(level=logging.DEBUG)
+logger = logging.getLogger(__name__)
 
 # Secret key for session management
 app.secret_key = os.urandom(24)
@@ -214,53 +219,47 @@ def generate_otp():
 
 
 
+
+
 @app.route('/verify_otp', methods=['POST'])
 def verify_otp():
-    if 'image' not in request.files:
-        return jsonify({'error': 'No image uploaded'}), 400
-
-    username = session.get('username')
-    if not username:
-        return jsonify({'error': 'Session or username missing'}), 400
-
-    image_file = request.files['image']
-    image_base64 = convert_image_to_base64(Image.open(image_file.stream))
-    # Save in the 'liveness' directory
-    image_path = save_base64_to_image(image_base64, username, 'liveliness', directory="liveness")
-
-    if not image_path:
-        return jsonify({'error': 'Image saving failed'}), 500
-
-    # Save the image path to the database immediately after it's generated
-    cur = mysql.connection.cursor()
     try:
-        cur.execute("UPDATE liveness SET liveness_image_path = %s WHERE username = %s", (image_path, username))
-        mysql.connection.commit()
-    except Exception as e:
-        mysql.connection.rollback()
-        return jsonify({'error': 'Failed to update image path in database'}), 500
+        if 'image' not in request.files:
+            return jsonify({'error': 'No image uploaded'}), 400
 
-    # Proceed with OTP verification
-    try:
-        extracted_text = pytesseract.image_to_string(Image.open(os.path.join('static', image_path)))
-        otp = session.get('otp')
+        username = session.get('username')
+        if not username:
+            return jsonify({'error': 'Session or username missing'}), 400
 
-        if str(otp) in extracted_text:
-            # Update status to 'OTP verified' if OTP matches
-            cur.execute("UPDATE liveness SET status = 'OTP verified' WHERE username = %s", [username])
+        image_file = request.files['image']
+
+        image = Image.open(image_file)
+        image_base64 = convert_image_to_base64(image)
+        image_path = save_base64_to_image(image_base64, username, 'liveness', directory='liveness')
+
+        cur = mysql.connection.cursor()
+        try:
+            cur.execute("UPDATE liveness SET liveness_image_path = %s WHERE username = %s", (image_path, username))
             mysql.connection.commit()
-            return jsonify({'success': True, 'message': 'Liveliness check passed.'})
-        else:
-            # Update status to 'OTP failed' if OTP does not match
-            cur.execute("UPDATE liveness SET status = 'OTP failed' WHERE username = %s", [username])
-            mysql.connection.commit()
-            return jsonify({'success': False, 'message': 'OTP does not match.'})
+        except Exception as e:
+            logger.error(f"Error updating liveness image path: {e}")
+            mysql.connection.rollback()
+
+        return jsonify({'success': True, 'image_path': image_path})
+
     except Exception as e:
-        mysql.connection.rollback()  # Roll back in case of any exception
+        logger.error(f"An error occurred: {e}")
         return jsonify({'error': str(e)}), 500
 
 
 
+
+
+# Face Match Route
+
+@app.route('/face_match')
+def face_match():
+    return render_template('face_match.html')
 
 
 
