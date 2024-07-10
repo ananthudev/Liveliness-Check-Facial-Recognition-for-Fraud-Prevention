@@ -34,9 +34,7 @@ This project aims to enhance the security and efficiency of virtual Know Your Cu
 
 ## 📸 Screenshots
 
-![Screenshot1](https://via.placeholder.com/600x300.png?text=Screenshot+1)
-![Screenshot2](https://via.placeholder.com/600x300.png?text=Screenshot+2)
-![Screenshot3](https://via.placeholder.com/600x300.png?text=Screenshot+3)
+Coming Soon!
 
 ## 📚 Literature Survey
 
