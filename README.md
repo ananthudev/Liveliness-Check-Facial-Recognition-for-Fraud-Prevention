@@ -53,7 +53,7 @@ The project successfully integrates liveliness checks and facial recognition to 
 
 ## 📄 License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+This project is licensed under the MIT License - see the [LICENSE](https://github.com/ananthudev/Liveliness-Check-Facial-Recognition-for-Fraud-Prevention/blob/d34d98dfabdef11a7237f3cb16fd4380c24abd71/LICENSE) file for details.
 
 ## 👥 Contributors
 
